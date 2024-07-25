@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useState, useEffect } from "react";
-import { ProductData } from "../App";
+import { ProductData } from "../pages/products/ListProducts";
+import products from "../data/products";
 
 interface CartItem extends ProductData {
   quantity: number;
@@ -11,6 +12,7 @@ export interface CartContextProps {
   totalItems: number;
   addProductToCart: (product: ProductData) => void;
   removeProductFromCart: (productId: number) => void;
+  getProduct: (productId?: string) => ProductData | undefined
 }
 
 type Props = {
@@ -23,6 +25,7 @@ export function CartContextProvider({ children }: Props) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [productList, setProductList] = useState<ProductData[]>([...products])
 
   useEffect(() => {
     const newTotal = cart.reduce((accum, item) => accum + item.price * item.quantity, 0);
@@ -64,12 +67,17 @@ export function CartContextProvider({ children }: Props) {
     });
   }
 
+  const getProduct = (productId?: string) => {
+    return productId ? productList.find(product => product.id === +productId) : undefined
+  }
+
   const cartItems = {
     cart,
     total,
     totalItems,
     addProductToCart,
     removeProductFromCart,
+    getProduct
   };
 
   return (
